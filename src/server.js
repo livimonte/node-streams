@@ -1,25 +1,29 @@
 import http from 'node:http'
-
-const users = []
+import { json } from './middlewares/json.js'
+import { routes } from './routes.js'
+import { extractQueryParams } from './utils/extract-query-params.js'
 
 const server = http.createServer(async (req, res) => {
   const { method, url } = req
 
-  if (method === 'GET' && url === '/users') {
-    return res.setHeader('content-type', 'application/json').end(JSON.stringify(users))
+  await json(req, res)
+
+  const route = routes.find((route) => {
+    return route.method === method && route.path.test(url)
+  })
+
+  if (route) {
+    const routeParams = req.url.match(route.path)
+
+    const { query, ...params } = routeParams.groups
+
+    req.params = params
+    req.query = query ? extractQueryParams(query) : {}
+
+    return route.handler(req, res)
   }
 
-  if (method === 'POST' && url === '/users') {
-    users.push({
-      id: 1,
-      name: 'Name',
-      email: 'email@email.com',
-    })
-
-    return res.writeHead(201).end()
-  }
-
-  return res.writeHead(404).end('Not found')
+  return res.writeHead(404).end(JSON.stringify({ error: 'Not Found' }))
 })
 
 server.listen(3333)
