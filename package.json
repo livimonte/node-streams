@@ -1,0 +1,16 @@
+{
+  "name": "node",
+  "version": "0.0.1",
+  "description": "Node.js with, Streams and a Rest API using HTTP native module",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "stream-server": "node --watch streams/stream-server.js",
+    "stream-upload": "node  streams/fake-upload.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+}
